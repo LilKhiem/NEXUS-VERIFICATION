@@ -998,7 +998,7 @@ export default function App() {
                                </div>
                                <div className="absolute top-0 left-0 bg-red-600 text-white font-extrabold text-[10px] px-2 py-0.5 tracking-widest uppercase shadow-sm flex items-center gap-1">
                                  <TrendingUp className="w-2.5 h-2.5" />
-                                 92% OFF
+                                 95% OFF
                                </div>
                                <div className="flex justify-between items-start mt-4">
                                  <div>
@@ -1010,7 +1010,7 @@ export default function App() {
                                  </div>
                                  <div className="text-right flex flex-col items-end shrink-0">
                                    <div className="flex flex-col items-end">
-                                     <span className="text-xs text-neutral-500 line-through decoration-red-500/50 leading-none mb-1 font-mono">$49.00</span>
+                                     <span className="text-xs text-neutral-500 line-through decoration-red-500/50 leading-none mb-1 font-mono">$79.00</span>
                                      <div className="relative group/price">
                                        <span className="text-2xl font-black text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] tabular-nums">$3.99</span>
                                        <div className="absolute -inset-1 bg-cyan-400/10 blur-md rounded-full -z-10 group-hover:bg-cyan-400/20 transition-all"></div>
@@ -1826,7 +1826,7 @@ export default function App() {
                         
                         <div className="relative z-10">
                           <div className="flex items-center gap-2 mb-4 shrink-0">
-                            <span className="bg-cyan-500 text-black text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">92% OFF</span>
+                            <span className="bg-cyan-500 text-black text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">95% OFF</span>
                             <span className="text-cyan-400 font-mono text-[10px] tracking-widest uppercase font-bold">// ADVERSARIAL_UNLOCK</span>
                           </div>
                           
@@ -2047,8 +2047,8 @@ export default function App() {
                     <div>
                       <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest block mb-0.5">Early Adopter Tier</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-neutral-500 line-through font-mono">$49.00</span>
-                        <div className="bg-red-500/20 text-red-500 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter">Save $45+</div>
+                        <span className="text-xs text-neutral-500 line-through font-mono">$79.00</span>
+                        <div className="bg-red-500/20 text-red-500 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter">Save $75+</div>
                       </div>
                     </div>
                     <div className="text-right">
