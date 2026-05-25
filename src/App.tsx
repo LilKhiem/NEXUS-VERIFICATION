@@ -1,32 +1,53 @@
 import { motion } from 'motion/react';
 import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { Terminal, Database, Activity, ShieldAlert, CheckCircle2, Cpu, Binary, XCircle, Upload, Play, RefreshCw, FileText, Settings, History, X } from 'lucide-react';
+import { Terminal, Database, Activity, ShieldAlert, CheckCircle2, Cpu, Binary, XCircle, Upload, Play, RefreshCw, FileText, Settings, History, X, Lock, CreditCard, ArrowRight, ShieldCheck, TrendingUp, Zap, LockOpen } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import './index.css';
 
 const MOCK_STRATEGIES = [
-  { id: 's1', name: 'Quantum Queen MT5', uploaded: '2026-05-13', creator: 'AlgoSys', version: '2.4.1', description: 'High-frequency statistical arbitrage on G10 currencies. Includes aggressive stop-loss logic.' },
-  { id: 's2', name: 'Zenox', uploaded: '2026-05-13', creator: 'NivenTech', version: '1.0.5', description: 'Deep learning based pattern recognition for indices. Analyzes sub-second microstructure.' },
-  { id: 's3', name: 'P01_crypto_perps_adapter', uploaded: '2026-05-13', creator: 'Team Alpha', version: '3.1.0', description: 'Perpetual futures adapter with funding rate arbitrage and cross-exchange hedging.' },
-  { id: 's4', name: 'P02_commodity_cta_adapter', uploaded: '2026-05-13', creator: 'Team Alpha', version: '1.2.2', description: 'Trend following CTA strategy applied to metals and energies. Uses multi-timeframe confirmation.' },
-  { id: 's5', name: 'P03_crypto_options_adapter', uploaded: '2026-05-13', creator: 'Sigma Risk', version: '0.9.8-b', description: 'Volatility surface arbitrage on Deribit. Specifically built for BTC and ETH skew trades.' },
-  { id: 's6', name: 'P04_spx_pcs_adapter', uploaded: '2026-05-13', creator: 'Theta Builders', version: '4.0.0', description: 'SPX put credit spread automated seller with strict delta hedging and fast tail-risk cuts.' },
-  { id: 's7', name: 'P08_market_regime_crypto_adapter', uploaded: '2026-05-13', creator: 'Marco Polo', version: '2.2.1', description: 'Switches between momentum and mean reversion based on realtime computed volatility regime.' }
+  { 
+    id: 's1', 
+    name: 'Quantum Queen MT5', 
+    uploaded: '2026-05-13', 
+    creator: 'AlgoSys', 
+    version: '2.4.1', 
+    description: 'High-frequency statistical arbitrage on G10 currencies. Includes aggressive stop-loss logic.',
+    history: [
+      { version: '2.4.0', uploaded: '2026-05-01', description: 'Quantum Queen standard statistical arbitration release. Optimized exit constraints on volatile regimes.' },
+      { version: '2.3.5', uploaded: '2026-04-12', description: 'Production candidate with beta-regsum constraints for MT5 trading pipelines.' }
+    ]
+  },
+  { 
+    id: 's2', 
+    name: 'Zenox', 
+    uploaded: '2026-05-13', 
+    creator: 'NivenTech', 
+    version: '1.0.5', 
+    description: 'Deep learning based pattern recognition for indices. Analyzes sub-second microstructure.',
+    history: [
+      { version: '1.0.4', uploaded: '2026-05-05', description: 'Zenox pattern recognition v1.0.4. Reduced sub-second delay parameters.' },
+      { version: '1.0.0', uploaded: '2026-03-01', description: 'Initial release of index recognition models.' }
+    ]
+  },
+  { id: 's3', name: 'P01_crypto_perps_adapter', uploaded: '2026-05-13', creator: 'Team Alpha', version: '3.1.0', description: 'Perpetual futures adapter with funding rate arbitrage and cross-exchange hedging.', history: [] },
+  { id: 's4', name: 'P02_commodity_cta_adapter', uploaded: '2026-05-13', creator: 'Team Alpha', version: '1.2.2', description: 'Trend following CTA strategy applied to metals and energies. Uses multi-timeframe confirmation.', history: [] },
+  { id: 's5', name: 'P03_crypto_options_adapter', uploaded: '2026-05-13', creator: 'Sigma Risk', version: '0.9.8-b', description: 'Volatility surface arbitrage on Deribit. Specifically built for BTC and ETH skew trades.', history: [] },
+  { id: 's6', name: 'P04_spx_pcs_adapter', uploaded: '2026-05-13', creator: 'Theta Builders', version: '4.0.0', description: 'SPX put credit spread automated seller with strict delta hedging and fast tail-risk cuts.', history: [] },
+  { id: 's7', name: 'P08_market_regime_crypto_adapter', uploaded: '2026-05-13', creator: 'Marco Polo', version: '2.2.1', description: 'Switches between momentum and mean reversion based on realtime computed volatility regime.', history: [] }
 ];
 
 const GAUNTLET_STAGES = [
-
-  { id: 'L0', name: 'DATA_INTEGRITY' },
-  { id: 'L1', name: 'LOGIC_INTEGRITY' },
-  { id: 'L1B', name: 'ECON_RATIONALE' },
-  { id: 'L2A', name: 'RISK_DECOMP' },
-  { id: 'L2B', name: 'STAT_INTEGRITY' },
-  { id: 'L2C', name: 'WALK_FORWARD' },
-  { id: 'L2D', name: 'MONTE_CARLO' },
-  { id: 'L3', name: 'EXECUTION_SIM' },
-  { id: 'L4', name: 'STRESS_REPLAY' },
-  { id: 'L5', name: 'PORTFOLIO_IND' },
-  { id: 'L6', name: 'EVIDENCE_REPRO' },
+  { id: 'L0', name: 'DATA_INTEGRITY', category: 'CORE' },
+  { id: 'L1', name: 'LOGIC_INTEGRITY', category: 'CORE' },
+  { id: 'L1B', name: 'ECON_RATIONALE', category: 'CORE' },
+  { id: 'L2A', name: 'RISK_DECOMP', category: 'CORE' },
+  { id: 'L2B', name: 'STAT_INTEGRITY', category: 'CORE' },
+  { id: 'L2C', name: 'WALK_FORWARD', category: 'CORE' },
+  { id: 'L2D', name: 'MONTE_CARLO', category: 'CORE' },
+  { id: 'L3', name: 'EXECUTION_SIM', category: 'ADVANCED' },
+  { id: 'L4', name: 'STRESS_REPLAY', category: 'ADVANCED' },
+  { id: 'L5', name: 'PORTFOLIO_IND', category: 'ADVANCED' },
+  { id: 'L6', name: 'EVIDENCE_REPRO', category: 'ADVANCED' },
 ];
 
 interface LogEntry {
@@ -90,10 +111,40 @@ function generateHex(length: number) {
   return result;
 }
 
+function incrementVersion(version: string): string {
+  const parts = version.split('.');
+  if (parts.length === 3) {
+    const patch = parseInt(parts[2], 10);
+    if (!isNaN(patch)) {
+      parts[2] = (patch + 1).toString();
+      return parts.join('.');
+    }
+  }
+  return version + '.1';
+}
+
 export default function App() {
   const [appMode, setAppMode] = useState<'selection' | 'verification'>('selection');
   const [selectedStrategy, setSelectedStrategy] = useState<string>('Quantum Queen MT5');
   const [focusedStrategyId, setFocusedStrategyId] = useState<string | null>(null);
+
+  const [strategies, setStrategies] = useState(MOCK_STRATEGIES);
+  const [selectedVersionMap, setSelectedVersionMap] = useState<Record<string, string>>({});
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'deep_analysis_3_99'>('free');
+  const selectedPlanRef = useRef<'free' | 'deep_analysis_3_99'>('free');
+
+  useEffect(() => {
+    selectedPlanRef.current = selectedPlan;
+  }, [selectedPlan]);
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentStrategyName, setPaymentStrategyName] = useState<string>('');
+  const [paymentStep, setPaymentStep] = useState<'form' | 'processing' | 'success'>('form');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [matrix, setMatrix] = useState<string[]>(Array(60).fill('0000'));
@@ -137,13 +188,239 @@ export default function App() {
   });
   const eqXRef = useRef(60);
 
-  const handleVerify = (strategyName: string) => {
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'json' | 'csv'>('json');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportJSON = (hasFailed: boolean, failedStages: any[]) => {
+    const data = {
+      verification_id: `run_${generateHex(12).toLowerCase()}`,
+      strategy_name: selectedStrategy,
+      plan: selectedPlan === 'deep_analysis_3_99' ? 'NEXUS Deep Analysis' : 'Free Strategy Scan',
+      verdict: hasFailed ? 'REJECTED_CONFIRMED_DEFECT' : 'PASSED_ALL_GATES',
+      capital_readiness: hasFailed ? 'NOT_READY' : 'READY_FOR_CAPITAL',
+      robustness_score: hasFailed ? 'None/100' : '98/100',
+      strategy_rank_score: hasFailed ? 38.32 : 92.50,
+      verification_mode: 'deterministic_offline',
+      timestamp: new Date().toISOString(),
+      gate_results: GAUNTLET_STAGES.map((stage, i) => ({
+        gate_id: stage.id,
+        gate_name: stage.name,
+        status: gauntlet[i]?.status || 'idle',
+        score: gauntlet[i]?.score || 0
+      })),
+      remediation: selectedPlan === 'deep_analysis_3_99' 
+        ? [
+            "Retest Strategy Logic with Simulated Stress Regime (Leverage 1:50, Slippage +1.5x, Backtest 5y)",
+            "Introduce soft-stop delta hedging offsets on fast tail-risk events.",
+            "Replace hard threshold exits with dynamic mean-reversion regression filters."
+          ]
+        : [
+            "General: Review logic for potential overfitting in recent regimes.",
+            "General: Consider adding basic volatility filter for entry conditions.",
+            "General: Verify stop-loss execution safety vs. historical slippage spikes.",
+            "Note: Detailed adversarial solutions locked. Deep Analysis required for specific parameter remediation."
+          ],
+      ...(selectedPlan === 'deep_analysis_3_99' ? {
+        deep_insights: {
+          slippage_sensitivity: {
+            optimistic_0_5x: 1.82,
+            realistic_1_0x: 1.45,
+            conservative_1_5x: 0.98,
+            verdict: "Fragile beyond 1.2x"
+          },
+          reproducibility: {
+            git_hash: `0x${generateHex(16).toLowerCase()}`,
+            data_parquet_id: `pq_${generateHex(8).toLowerCase()}_v4`,
+            indicator_params: "MA_LEN: 24, RSI: 14, VOL_MULT: 1.5"
+          },
+          regime_performance: {
+            bull: { pf: 1.92, win: "68%" },
+            bear: { pf: 0.62, win: "32%", warning: "Ticking Time Bomb" },
+            sideways: { pf: 1.24, win: "51%" }
+          },
+          human_audit: "AlgoXpert Team Verified",
+          kill_verdict: "CONDITIONAL_DEPLOY: DO NOT DEPLOY if bearer regime detectors signal > 0.8 conf."
+        }
+      } : {})
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nexus_report_${selectedStrategy.replace(/\s+/g, '_').toLowerCase()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCSV = (hasFailed: boolean) => {
+    const headers = ["Field", "Value"];
+    const rows = [
+      ["Verification ID", `run_${generateHex(12).toLowerCase()}`],
+      ["Strategy Name", selectedStrategy],
+      ["Plan", selectedPlan === 'deep_analysis_3_99' ? "NEXUS Deep Analysis" : "Free Strategy Scan"],
+      ["Verdict", hasFailed ? "REJECTED_CONFIRMED_DEFECT" : "PASSED_ALL_GATES"],
+      ["Capital Readiness", hasFailed ? "NOT_READY" : "READY_FOR_CAPITAL"],
+      ["Robustness Score", hasFailed ? "None/100" : "98/100"],
+      ["Strategy Rank Score", hasFailed ? "38.32/100" : "92.50/100"],
+      ["Verification Mode", "deterministic_offline"]
+    ];
+    
+    let csvContent = headers.join(",") + "\n" + rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nexus_report_${selectedStrategy.replace(/\s+/g, '_').toLowerCase()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = (hasFailed: boolean, failedStages: any[]) => {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>NEXUS Deep Verification Ledger - ${selectedStrategy}</title>
+        <style>
+          body { font-family: sans-serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; margin: 0; }
+          .container { max-width: 800px; margin: 0 auto; border: 1px solid #262626; padding: 30px; background: #000; }
+          .header { border-bottom: 2px solid #06b6d4; padding-bottom: 20px; margin-bottom: 30px; }
+          .title { font-size: 24px; font-weight: bold; color: #06b6d4; letter-spacing: 2px; font-family: monospace; }
+          .subtitle { font-size: 11px; color: #737373; margin-top: 5px; font-family: monospace; }
+          .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 13px; }
+          .table th { background: #171717; border: 1px solid #262626; padding: 12px; text-align: left; color: #a3a3a3; }
+          .table td { border: 1px solid #262626; padding: 12px; }
+          .val { font-weight: bold; font-family: monospace; }
+          .badge { padding: 4px 8px; font-size: 10px; font-weight: bold; font-family: monospace; }
+          .fail { color: #f87171; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); }
+          .pass { color: #34d399; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); }
+          .section-title { font-size: 15px; color: #06b6d4; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #262626; padding-bottom: 5px; font-family: monospace; text-transform: uppercase; }
+          .recommendation { background: #171717; border: 1px solid #262626; padding: 15px; font-size: 13px; margin-bottom: 30px; line-height: 1.5; }
+          .footer { font-size: 11px; color: #525252; border-top: 1px solid #262626; padding-top: 20px; font-style: italic; font-family: monospace; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="title">NEXUS VERIFICATION LEDGER</div>
+            <div class="subtitle">AUTOMATED ADVERSARIAL ANALYSIS // DEEPLINKSECURE_${generateHex(4).toUpperCase()}</div>
+          </div>
+          
+          <table class="table">
+            <thead>
+              <tr><th style="width: 40%">Field</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Strategy Name</td><td class="val">${selectedStrategy}</td></tr>
+              <tr><td>Verification ID</td><td class="val">run_${generateHex(12).toLowerCase()}</td></tr>
+              <tr><td>Plan Selected</td><td class="val">${selectedPlan === 'deep_analysis_3_99' ? 'NEXUS Deep Analysis' : 'Free Strategy Scan'}</td></tr>
+              <tr><td>Verdict</td><td class="val"><span class="badge ${hasFailed ? 'fail' : 'pass'}">${hasFailed ? 'REJECTED_CONFIRMED_DEFECT' : 'PASSED_ALL_GATES'}</span></td></tr>
+              <tr><td>Capital Readiness</td><td class="val">${hasFailed ? 'NOT_READY' : 'READY_FOR_CAPITAL'}</td></tr>
+              <tr><td>Strategy Rank Score</td><td class="val">${hasFailed ? '38.32/100 (Fixable Defect)' : '92.50/100 (Production Ready)'}</td></tr>
+              <tr><td>Verification Mode</td><td class="val">deterministic_offline</td></tr>
+            </tbody>
+          </table>
+
+          <div class="section-title">Confirmatory Findings</div>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+            ${hasFailed 
+              ? `The strategy demonstrated significant fragility under simulated market regime changes. Decisive failure was identified at gate ${failedStages.map(fs => fs?.id).join(', ')}.`
+              : `The strategy successfully bypassed slip stress, Monte Carlo regime-shuffling, and simulated slippage checks with robust alpha preservation across all 11 gates.`
+            }
+          </p>
+
+          <div class="section-title">Failure Mitigation Suggestions</div>
+          <div class="recommendation">
+            ${selectedPlan === 'deep_analysis_3_99' 
+              ? `<b>Premium Actionable Rectification Steps:</b><br/>
+                 1. Retest Strategy Logic with Simulated Stress Regime (Leverage 1:50, Slippage +1.5x, Backtest 5y)<br/>
+                 2. Introduce soft-stop delta hedging offsets on fast tail-risk events to capture structural anomalies.<br/>
+                 3. Shift optimization metrics away from simple Sortino ratios into adversarial multi-regime fitness levels.`
+              : `UPGRADE REQUIRED: Detailed failure mitigations, retested configuration settings and failure-remedy parameters are locked. Upgrade to NEXUS Deep Analysis to unlock.`
+            }
+          </div>
+
+          ${selectedPlan === 'deep_analysis_3_99' ? `
+          <div class="section-title">Deep Adversarial Insights</div>
+          <div class="recommendation" style="font-family: monospace; font-size: 11px;">
+            <b>REGIME ANALYSIS:</b><br/>
+            - BULL: PF 1.92 (Nominal)<br/>
+            - BEAR: PF 0.62 (CRITICAL DECAY)<br/>
+            - CHOP: PF 1.24 (Stable)<br/><br/>
+            <b>SLIPPAGE SENSITIVITY:</b><br/>
+            - 0.5x: 1.82 | 1.0x: 1.45 | 1.5x: 0.98<br/>
+            Verdict: Strategy edge is fragile to execution volatility.<br/><br/>
+            <b>REPRODUCIBILITY TRAIL:</b><br/>
+            - GIT_HASH: 0x${generateHex(16).toLowerCase()}<br/>
+            - DATA_ID: pq_${generateHex(8).toLowerCase()}_v4<br/><br/>
+            <b>ADVISORY VERDICT:</b><br/>
+            - STATUS: CONDITIONAL_DEPLOY<br/>
+            - KILL CRITERIA: Reject deployment if bearer regime > 0.8 conf.<br/>
+            - HUMAN AUDIT: AlgoXpert Certified.
+          </div>
+          ` : ''}
+
+          <div class="footer">
+            Generated automatically by NEXUS Protocol on ${new Date().toUTCString()}. Clean printable stylesheet; print or save as PDF inside browser for physical compliance.
+          </div>
+        </div>
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nexus_report_${selectedStrategy.replace(/\s+/g, '_').toLowerCase()}.html`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePaymentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentError(null);
+    
+    // Basic validation (simulated)
+    if (cardNumber.replace(/\s/g, '').length < 16 || cardExpiry.length < 4 || cardCvc.length < 3 || !cardName) {
+      setPaymentError("Invalid payment details. Please check all fields.");
+      return;
+    }
+    
+    setPaymentStep('processing');
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      setPaymentStep('success');
+      
+      // Auto-trigger verification after success
+      setTimeout(() => {
+        setShowPaymentModal(false);
+        handleVerify(paymentStrategyName, 'deep_analysis_3_99');
+        // Reset form
+        setCardNumber('');
+        setCardExpiry('');
+        setCardCvc('');
+        setCardName('');
+      }, 1500);
+    }, 2500);
+  };
+
+  const handleVerify = (strategyName: string, planOverride?: 'free' | 'deep_analysis_3_99') => {
     setSelectedStrategy(strategyName);
     setAppMode('verification');
     setActiveTab('Configuration & Run');
     
+    const finalPlan = planOverride !== undefined ? planOverride : selectedPlan;
+    setSelectedPlan(finalPlan);
+    selectedPlanRef.current = finalPlan;
+    
     // Immediately start running gauntlet and visualizations
-    resetGauntlet(strategyName);
+    resetGauntlet(strategyName, finalPlan);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,7 +462,7 @@ export default function App() {
              } catch (err) {
                 setUploadError("Invalid JSON structure in file.");
                 return;
-             }
+              }
           }
           if (ext === 'py') {
             if (!content.includes('class') && !content.includes('def') && !content.includes('import')) {
@@ -199,8 +476,55 @@ export default function App() {
                return;
             }
           }
-          // Passed validation
-          handleVerify(file.name);
+          // Passed validation - Add and select with version register support
+          setStrategies(prev => {
+            const existingIdx = prev.findIndex(s => s.name.toLowerCase() === file.name.toLowerCase());
+            if (existingIdx !== -1) {
+              const existing = prev[existingIdx];
+              const nextVer = incrementVersion(existing.version);
+              const historyItem = {
+                version: existing.version,
+                uploaded: existing.uploaded,
+                description: existing.description
+              };
+              const updatedHistory = existing.history ? [historyItem, ...existing.history] : [historyItem];
+              const updatedStrategy = {
+                ...existing,
+                version: nextVer,
+                uploaded: new Date().toISOString().split('T')[0],
+                description: `User-uploaded local rule module v${nextVer}: ${file.name}. Validated signature, ready for premium backtests.`,
+                history: updatedHistory
+              };
+              const newStrategies = [...prev];
+              newStrategies[existingIdx] = updatedStrategy;
+              
+              // Set selection state mapping in microtask
+              setTimeout(() => {
+                setFocusedStrategyId(existing.id);
+                setSelectedVersionMap(vprev => ({ ...vprev, [existing.id]: nextVer }));
+              }, 20);
+              
+              return newStrategies;
+            } else {
+              const newId = `u-${Date.now()}`;
+              const newStrategy = {
+                id: newId,
+                name: file.name,
+                uploaded: new Date().toISOString().split('T')[0],
+                creator: 'Local Operator',
+                version: '1.0.0',
+                description: `User-uploaded local rule module: ${file.name}. Validated signature, ready for premium backtests.`,
+                history: []
+              };
+              
+              setTimeout(() => {
+                setFocusedStrategyId(newId);
+                setSelectedVersionMap(vprev => ({ ...vprev, [newId]: '1.0.0' }));
+              }, 20);
+              
+              return [newStrategy, ...prev];
+            }
+          });
           if (fileInputRef.current) fileInputRef.current.value = "";
         };
         reader.onerror = () => {
@@ -209,15 +533,62 @@ export default function App() {
         };
         reader.readAsText(file);
       } else {
-        // Binary files passing general validation
-        handleVerify(file.name);
+        // Binary files passing general validation - Add and select with version registry support
+        setStrategies(prev => {
+          const existingIdx = prev.findIndex(s => s.name.toLowerCase() === file.name.toLowerCase());
+          if (existingIdx !== -1) {
+            const existing = prev[existingIdx];
+            const nextVer = incrementVersion(existing.version);
+            const historyItem = {
+              version: existing.version,
+              uploaded: existing.uploaded,
+              description: existing.description
+            };
+            const updatedHistory = existing.history ? [historyItem, ...existing.history] : [historyItem];
+            const updatedStrategy = {
+              ...existing,
+              version: nextVer,
+              uploaded: new Date().toISOString().split('T')[0],
+              description: `User-uploaded binary module v${nextVer}: ${file.name}. Ready for sandboxed evaluation.`,
+              history: updatedHistory
+            };
+            const newStrategies = [...prev];
+            newStrategies[existingIdx] = updatedStrategy;
+            
+            setTimeout(() => {
+              setFocusedStrategyId(existing.id);
+              setSelectedVersionMap(vprev => ({ ...vprev, [existing.id]: nextVer }));
+            }, 20);
+            
+            return newStrategies;
+          } else {
+            const newId = `u-${Date.now()}`;
+            const newStrategy = {
+              id: newId,
+              name: file.name,
+              uploaded: new Date().toISOString().split('T')[0],
+              creator: 'Local Operator',
+              version: '1.0.0',
+              description: `User-uploaded binary module: ${file.name}. Ready for sandboxed evaluation.`,
+              history: []
+            };
+            
+            setTimeout(() => {
+              setFocusedStrategyId(newId);
+              setSelectedVersionMap(vprev => ({ ...vprev, [newId]: '1.0.0' }));
+            }, 20);
+            
+            return [newStrategy, ...prev];
+          }
+        });
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
     }
   };
 
-  const resetGauntlet = (strategyNameOverride?: string) => {
+  const resetGauntlet = (strategyNameOverride?: string, planOverride?: 'free' | 'deep_analysis_3_99') => {
     const targetStrategyName = strategyNameOverride || selectedStrategy;
+    const currentPlan = planOverride || selectedPlan;
     const initial = GAUNTLET_STAGES.map(() => ({ score: 0, status: 'idle' as StageStatus }));
     gauntletRef.current = initial;
     setGauntlet(initial);
@@ -236,6 +607,7 @@ export default function App() {
 
     // Start with rich verification dispatch logs
     const t = new Date().toISOString().split('T')[1].slice(0, -1);
+    const modeLabel = currentPlan === 'deep_analysis_3_99' ? 'NEXUS DEEP ANALYSIS (PREMIUM DETECTOR)' : 'STANDARD FREE SCAN';
     setLogs([
       {
         id: 'start-0',
@@ -247,6 +619,14 @@ export default function App() {
       },
       {
         id: 'start-1',
+        timestamp: t,
+        level: 'INFO',
+        pid: `0x${generateHex(4)}`,
+        message: `MODE: ${modeLabel} // DETECT_LEVEL: max_resolution`,
+        hash: generateHex(8)
+      },
+      {
+        id: 'start-2',
         timestamp: t,
         level: 'INFO',
         pid: `0x${generateHex(4)}`,
@@ -370,8 +750,11 @@ export default function App() {
         const isFail = failIndicesRef.current.includes(activeIdx);
         const threshold = 65 + Math.random() * 20; // Random fail threshold %
 
-        // Slower and smoother increments
-        stage.score += (Math.random() * 1.5) + 0.8;
+        // Slower and smoother increments, L0-L6 run faster per user request
+        const incrementAmount = activeIdx <= 6 
+          ? (Math.random() * 3.5) + 2.5 
+          : (Math.random() * 1.5) + 0.8;
+        stage.score += incrementAmount;
 
         if (isFail && stage.score >= threshold) {
           stage.score = threshold;
@@ -480,34 +863,36 @@ export default function App() {
 
             <div className="flex-1 flex gap-6 min-h-0">
                {/* Strategy List */}
-               <div className="w-1/2 lg:w-2/3 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                  {MOCK_STRATEGIES.map(strategy => {
+               <div className="w-1/3 xl:w-1/4 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                  {strategies.map(strategy => {
                     const isSelected = focusedStrategyId === strategy.id;
                     return (
                       <div 
                         key={strategy.id} 
-                        className={`flex items-center justify-between p-4 border transition-all cursor-pointer group ${isSelected ? 'border-emerald-500 bg-emerald-950/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-neutral-800 bg-neutral-900/30 hover:bg-neutral-800/50'}`}
+                        onClick={() => setFocusedStrategyId(strategy.id)}
+                        className={`flex items-center justify-between p-4 border transition-all cursor-pointer group ${isSelected ? 'border-cyan-500 bg-cyan-950/10 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border-neutral-800 bg-neutral-900/30 hover:bg-neutral-800/50'}`}
                       >
-                         <div className="flex-1 flex items-start gap-4" onClick={() => setFocusedStrategyId(strategy.id)}>
+                         <div className="flex-1 flex items-start gap-4">
                            <div className="mt-1">
-                             <FileText className={`w-5 h-5 transition-colors ${isSelected ? 'text-emerald-400' : 'text-neutral-500 group-hover:text-white'}`} />
+                             <FileText className={`w-5 h-5 transition-colors ${isSelected ? 'text-cyan-400' : 'text-neutral-500 group-hover:text-white'}`} />
                            </div>
                            <div>
-                             <div className={`font-bold transition-all mb-1 ${isSelected ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'text-neutral-200 group-hover:text-white group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]'}`}>
+                             <div className={`font-bold transition-all mb-1 ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]' : 'text-neutral-200 group-hover:text-white group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]'}`}>
                                {strategy.name}
                              </div>
-                             <div className="text-[10px] text-neutral-500">Uploaded: {strategy.uploaded}</div>
+                             <div className="text-[10px] text-neutral-500 flex gap-4">
+                               <span>Uploaded: {strategy.uploaded}</span>
+                               <span>v{strategy.version}</span>
+                             </div>
                            </div>
                          </div>
-                         {isSelected && (
-                           <button 
-                             onClick={(e) => { e.stopPropagation(); handleVerify(strategy.name); }}
-                             className="flex items-center gap-2 px-3 py-1.5 border border-emerald-500 bg-emerald-500 text-black hover:bg-emerald-400 transition-all font-bold text-xs group/btn relative z-10 shadow-[0_0_10px_rgba(16,185,129,0.2)] ml-4"
-                           >
-                             <Play className="w-3 h-3 fill-current" />
-                             RUN
-                           </button>
-                         )}
+                         <div className="flex items-center gap-2">
+                           {isSelected ? (
+                             <span className="text-[10px] tracking-wider text-cyan-400 font-mono bg-cyan-950/50 px-2.5 py-1 border border-cyan-800 uppercase">Selected</span>
+                           ) : (
+                             <span className="text-[10px] tracking-wider text-neutral-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity">Click to Analyze</span>
+                           )}
+                         </div>
                       </div>
                     );
                   })}
@@ -515,29 +900,59 @@ export default function App() {
 
                {/* Strategy Details Sidebar */}
                {focusedStrategyId ? (
-                 <div className="w-1/2 lg:w-1/3 border border-neutral-800 bg-neutral-900/40 p-6 flex flex-col relative overflow-y-auto custom-scrollbar">
+                 <div className="w-2/3 xl:w-3/4 border border-neutral-800 bg-neutral-900/40 p-8 flex flex-col relative overflow-y-auto custom-scrollbar">
                    <div className="absolute top-0 right-0 p-4 opacity-10">
                       <Settings className="w-32 h-32" />
                    </div>
-                   
-                   {(() => {
-                      const strategy = MOCK_STRATEGIES.find(s => s.id === focusedStrategyId)!;
+                                      {(() => {
+                      const strategy = strategies.find(s => s.id === focusedStrategyId);
+                      if (!strategy) return null;
+                      
+                      const selectedVer = selectedVersionMap[strategy.id] || strategy.version;
+                      const activeDetail = selectedVer === strategy.version 
+                        ? strategy 
+                        : (strategy.history?.find(h => h.version === selectedVer) || strategy);
+                      
                       return (
                         <>
-                          <h2 className="text-xl font-bold text-white mb-2 relative z-10">{strategy.name}</h2>
-                          <div className="flex flex-wrap gap-2 mb-6 relative z-10 shrink-0">
-                            <span className="px-2 py-1 text-[10px] border border-cyan-900 bg-cyan-950/30 text-cyan-400">v{strategy.version}</span>
-                            <span className="px-2 py-1 text-[10px] border border-neutral-700 bg-neutral-800 text-neutral-300">AUTHOR: {strategy.creator}</span>
+                          <h2 className="text-3xl font-black text-white mb-2 relative z-10 tracking-tight">{strategy.name}</h2>
+                          <div className="flex flex-wrap gap-3 mb-6 relative z-10 shrink-0">
+                            <span className="px-3 py-1 text-xs border border-cyan-900 bg-cyan-950/30 text-cyan-400 font-bold tracking-tight">v{activeDetail.version}</span>
+                            <span className="px-3 py-1 text-xs border border-neutral-700 bg-neutral-800 text-neutral-300 font-mono uppercase tracking-widest leading-none flex items-center">AUTHOR: {strategy.creator}</span>
                           </div>
 
-                          <div className="space-y-4 flex-1 relative z-10 overflow-y-auto custom-scrollbar">
+                          {/* Version Registry Dropdown */}
+                          {strategy.history && strategy.history.length > 0 && (
+                            <div className="mb-4 bg-neutral-950/40 p-3 border border-neutral-850 relative z-10 shrink-0">
+                              <label className="text-[9px] tracking-widest text-neutral-500 font-bold block mb-1 uppercase font-mono">
+                                VERSION REGISTER
+                              </label>
+                              <select 
+                                value={selectedVer}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setSelectedVersionMap(prev => ({ ...prev, [strategy.id]: val }));
+                                }}
+                                className="w-full bg-neutral-900 border border-neutral-700 hover:border-neutral-500 text-xs text-neutral-200 px-2.5 py-1 font-mono transition-colors focus:border-cyan-500 focus:outline-none cursor-pointer"
+                              >
+                                <option value={strategy.version}>v{strategy.version} (Active / Latest)</option>
+                                {strategy.history.map(hist => (
+                                  <option key={hist.version} value={hist.version}>
+                                    v{hist.version} (Uploaded: {hist.uploaded})
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          <div className="space-y-4 flex-1 relative z-10 overflow-y-auto custom-scrollbar animate-fadeIn">
                              <div>
                                <div className="text-[10px] text-neutral-500 mb-1">DESCRIPTION</div>
-                               <div className="text-sm text-neutral-300 leading-relaxed">{strategy.description}</div>
+                               <div className="text-sm text-neutral-300 leading-relaxed">{activeDetail.description}</div>
                              </div>
                              <div>
                                <div className="text-[10px] text-neutral-500 mb-1">LAST UPLOAD</div>
-                               <div className="text-sm text-neutral-300">{strategy.uploaded}</div>
+                               <div className="text-sm text-neutral-300">{activeDetail.uploaded}</div>
                              </div>
                              <div>
                                <div className="text-[10px] text-neutral-500 mb-1">CHECKSUM</div>
@@ -545,19 +960,92 @@ export default function App() {
                              </div>
                           </div>
 
-                          <button 
-                            onClick={() => handleVerify(strategy.name)}
-                            className="w-full mt-6 flex items-center justify-center gap-2 px-6 py-3 border border-white bg-white text-black hover:bg-neutral-200 transition-all font-bold group relative z-10 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] shrink-0"
-                          >
-                            <Play className="w-4 h-4 fill-current" />
-                            LOAD & VERIFY
-                          </button>
+                          {/* Plan Selection Card Group */}
+                          <div className="mt-8 border-t border-neutral-800 pt-8 shrink-0 relative z-10">
+                             <div className="text-sm font-bold tracking-widest text-neutral-400 uppercase mb-4">
+                               Free Scan or Deep Analysis?
+                             </div>
+                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
+                             {/* Free Scan Selection Card */}
+                             <div className="border border-neutral-800 bg-neutral-950/40 p-6 transition-all hover:border-neutral-700 relative group flex flex-col">
+                               <div className="flex justify-between items-start">
+                                 <div>
+                                   <h3 className="text-sm font-bold text-neutral-200">Free Strategy Scan</h3>
+                                   <p className="text-xs text-neutral-500 mt-1">Automated logical verification for strategy architecture.</p>
+                                 </div>
+                                 <span className="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-1 font-mono uppercase font-semibold">FREE</span>
+                               </div>
+                               <ul className="text-xs text-neutral-500 space-y-2 mt-4 pl-4 list-disc">
+                                 <li><span className="font-bold text-neutral-400">Core Logic Audit</span>: Basic weakness identification</li>
+                                 <li><span className="font-bold text-neutral-400">Surface Risk</span>: Volatility & Leverage signal checks</li>
+                                 <li><span className="font-bold text-neutral-400">Monte Carlo Lite</span>: 50 iterations for base stability</li>
+                                 <li><span className="font-bold text-neutral-400">Benchmark Drift</span>: Correlation vs. BTC/SPX</li>
+                                 <li><span className="font-bold text-neutral-400">DD Stress</span>: Max Drawdown duration analysis</li>
+                               </ul>
+                               <button 
+                                 onClick={() => handleVerify(strategy.name, 'free')}
+                                 className="w-full mt-5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 hover:border-neutral-500 text-neutral-200 text-sm py-2.5 uppercase tracking-wider font-bold transition-all cursor-pointer active:scale-[0.98]"
+                               >
+                                 Start Free Scan
+                               </button>
+                             </div>
+
+                             {/* Paid Deep Analysis Selection Card */}
+                             <div className="border-2 border-cyan-500 bg-cyan-950/20 p-6 relative shadow-[0_0_20px_rgba(6,182,212,0.15)] overflow-hidden transition-all hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] flex flex-col">
+                               <div className="absolute top-0 right-0 bg-cyan-500 text-black font-extrabold text-[10px] px-2 py-0.5 tracking-widest uppercase shadow-sm">
+                                 Beta Offer
+                               </div>
+                               <div className="absolute top-0 left-0 bg-red-600 text-white font-extrabold text-[10px] px-2 py-0.5 tracking-widest uppercase shadow-sm flex items-center gap-1">
+                                 <TrendingUp className="w-2.5 h-2.5" />
+                                 92% OFF
+                               </div>
+                               <div className="flex justify-between items-start mt-4">
+                                 <div>
+                                   <h3 className="text-sm font-bold text-cyan-400 flex items-center gap-1.5">
+                                     <Cpu className="w-4 h-4 animate-pulse shrink-0" />
+                                     NEXUS Deep Analysis
+                                   </h3>
+                                   <p className="text-xs text-cyan-300/70 mt-1">Go deeper into what may break, why it may break, and what to retest next. <span className="text-cyan-400 font-bold tracking-tighter uppercase italic block mt-1">Phase 1 Early Access</span></p>
+                                 </div>
+                                 <div className="text-right flex flex-col items-end shrink-0">
+                                   <div className="flex flex-col items-end">
+                                     <span className="text-xs text-neutral-500 line-through decoration-red-500/50 leading-none mb-1 font-mono">$49.00</span>
+                                     <div className="relative group/price">
+                                       <span className="text-2xl font-black text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] tabular-nums">$3.99</span>
+                                       <div className="absolute -inset-1 bg-cyan-400/10 blur-md rounded-full -z-10 group-hover:bg-cyan-400/20 transition-all"></div>
+                                     </div>
+                                   </div>
+                                 </div>
+                               </div>
+                               <ul className="text-xs text-neutral-300 space-y-2 mt-4 pl-4 list-disc">
+                                 <li>Hidden weakness detection</li>
+                                 <li>Execution / slippage / regime risk insights</li>
+                                 <li>Failure-mode breakdown</li>
+                                 <li>Retest suggestions</li>
+                                 <li>Enhanced human audit with AlgoXpert team</li>
+                                 <li>Stronger NEXUS report output</li>
+                               </ul>
+                               <button 
+                                 onClick={() => { setPaymentStrategyName(strategy.name); setPaymentStep('form'); setPaymentError(null); setShowPaymentModal(true); }}
+                                 className="w-full mt-5 bg-cyan-500 hover:bg-cyan-400 text-black text-sm py-3 uppercase tracking-widest font-extrabold transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)] cursor-pointer active:scale-[0.98]"
+                               >
+                                 Unlock Deep Analysis — $3.99
+                               </button>
+                             </div>
+
+                             </div>
+
+                             <p className="text-[10px] text-neutral-500 leading-relaxed text-center mt-6 font-sans italic opacity-60">
+                               NEXUS does not provide financial advice, trading signals, or performance guarantees. Reports are for strategy logic verification only.
+                             </p>
+                          </div>
                         </>
                       );
                    })()}
                  </div>
                ) : (
-                 <div className="w-1/2 lg:w-1/3 border border-neutral-800 border-dashed bg-neutral-900/10 p-6 flex flex-col items-center justify-center text-neutral-600">
+                 <div className="w-2/3 xl:w-3/4 border border-neutral-800 border-dashed bg-neutral-900/10 p-6 flex flex-col items-center justify-center text-neutral-600">
                     <History className="w-12 h-12 mb-4 opacity-20" />
                     <p className="text-sm text-center px-4">Select a strategy from the list to view its details and verification options.</p>
                  </div>
@@ -948,6 +1436,7 @@ export default function App() {
                       <div className="flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 shrink-0 ${dotClass}`}></span>
                         <span className={`w-8 font-bold leading-none flex items-center ${isComplete ? 'text-emerald-400' : isFailed ? 'text-red-400' : ''}`}>{stageInfo.id}</span>
+                        <span className="truncate leading-none flex items-center uppercase text-[8px] font-mono opacity-60">[{stageInfo.category}]</span>
                         <span className="truncate leading-none flex items-center">{stageInfo.name}</span>
                       </div>
                       <div className={`font-mono tabular-nums w-12 text-right leading-none flex items-center justify-end ${isComplete ? 'font-bold' : isFailed ? 'font-bold' : ''}`}>
@@ -1099,6 +1588,30 @@ export default function App() {
                       </ul>
                     </>
                   )}
+                  <br/>
+                  {selectedPlan === 'free' && (
+                    <div className="mt-8 pt-8 border-t border-neutral-800 animate-fadeIn">
+                      <div className="bg-cyan-950/10 border border-cyan-500/30 p-8 rounded-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-500">
+                          <Cpu className="w-28 h-28 text-cyan-500" />
+                        </div>
+                        <div className="relative z-10">
+                          <div className="text-[10px] font-bold text-cyan-500 uppercase tracking-[0.3em] mb-2">PRO_REPORT_NUDGE</div>
+                          <h4 className="text-2xl font-black text-cyan-400 tracking-tighter mb-3 leading-none">UNLOCK FULL ADVERSARIAL EXPLAINER</h4>
+                          <p className="text-sm text-cyan-300/70 mb-8 max-w-xl leading-relaxed">
+                            This explanation uses base-layer deterministic heuristics. Upgrade to <b className="text-cyan-400 font-bold">Deep Analysis</b> to unlock failure-pattern remediation, adversarial logic reasoning, and the full AlgoXpert human-audit trail for this strategy version.
+                          </p>
+                          <button 
+                            onClick={() => { setPaymentStrategyName(selectedStrategy); setPaymentStep('form'); setPaymentError(null); setShowPaymentModal(true); }}
+                            className="bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs px-8 py-3.5 uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] cursor-pointer active:scale-95 flex items-center gap-2"
+                          >
+                            <ShieldAlert className="w-4 h-4" />
+                            Upgrade to NEXUS Deep — $3.99
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <br/><br/>
                 </>
               );
@@ -1118,7 +1631,83 @@ export default function App() {
 
               return (
                 <>
-                 <h3 className="text-lg font-bold text-emerald-400 mb-4">Summary</h3>
+                  {/* Premium Report Welcome Banner */}
+                  {selectedPlan === 'deep_analysis_3_99' ? (
+                    <div className="mb-6 p-4 border border-cyan-500 bg-cyan-950/20 text-cyan-400 rounded-sm relative shadow-[0_0_15px_rgba(6,182,212,0.1)] flex items-center justify-between gap-4">
+                      <div>
+                        <div className="text-sm font-bold tracking-wider uppercase flex items-center gap-2">
+                          <Cpu className="w-4 h-4 animate-pulse shrink-0" />
+                          NEXUS DEEP COMPREHENSIVE REPORT UNLOCKED
+                        </div>
+                        <p className="text-xs text-cyan-300/80 mt-1">
+                          Full adversarial vulnerability assessment successfully unlocked for {selectedStrategy}. Human audit by AlgoXpert team complete.
+                        </p>
+                      </div>
+                      <span className="text-[9px] bg-cyan-500 text-black px-2 py-0.5 font-mono font-bold tracking-wider uppercase shrink-0">DEEP SCAN ACTIVE</span>
+                    </div>
+                  ) : (
+                    <div className="mb-6 p-4 border border-neutral-800 bg-neutral-900/30 text-neutral-400 rounded-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <div className="text-xs font-bold text-neutral-300 uppercase tracking-wider">STANDARD SCAN REPORT</div>
+                        <p className="text-xs text-neutral-500 mt-1">You are currently viewing a standard logic-scan run. Upgrade to Deep Analysis for $3.99 to unlock remediation protocols and parameters retesting logs.</p>
+                      </div>
+                      <button onClick={() => { setPaymentStrategyName(selectedStrategy); setPaymentStep('form'); setPaymentError(null); setShowPaymentModal(true); }} className="px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-[10px] uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(6,182,212,0.2)] shrink-0 cursor-pointer">
+                        Upgrade report — $3.99
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-neutral-850 pb-4 mb-6 gap-4">
+                    <div>
+                      <h2 className="text-xl font-bold text-emerald-400">NEXUS Verification Ledger</h2>
+                      <p className="text-xs text-neutral-500 mt-1">Cryptographic audit reports of strategy logical edge and stress parameters</p>
+                    </div>
+                    
+                    {/* Export Format Selector */}
+                    <div className="flex items-center gap-2 bg-neutral-900/50 p-2 border border-neutral-800 rounded-sm shrink-0">
+                      <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-mono mr-2">EXPORT FORMAT:</span>
+                      {['JSON', 'CSV', 'PDF'].map((fmt) => (
+                        <button
+                          key={fmt}
+                          onClick={() => setExportFormat(fmt.toLowerCase() as 'pdf' | 'json' | 'csv')}
+                          className={`px-2.5 py-1 text-[10px] font-mono transition-all font-bold ${exportFormat === fmt.toLowerCase() ? 'bg-emerald-500 text-black' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}`}
+                        >
+                          {fmt}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => {
+                          setIsExporting(true);
+                          setTimeout(() => {
+                            if (exportFormat === 'json') {
+                              handleExportJSON(hasFailed, failedStages);
+                            } else if (exportFormat === 'csv') {
+                              handleExportCSV(hasFailed);
+                            } else {
+                              handleExportPDF(hasFailed, failedStages);
+                            }
+                            setIsExporting(false);
+                          }, 800);
+                        }}
+                        disabled={isExporting}
+                        className={`ml-2 px-4 py-1.5 transition-all text-[10px] uppercase font-bold flex items-center gap-1.5 cursor-pointer ${isExporting ? 'bg-neutral-800 text-neutral-600 border-neutral-700' : 'bg-emerald-500 border border-emerald-400 text-black hover:bg-emerald-400 font-bold active:scale-95'}`}
+                      >
+                        {isExporting ? (
+                          <>
+                            <RefreshCw className="w-3 h-3 animate-spin shrink-0" />
+                            BUILDING...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3 h-3 rotate-180 shrink-0" />
+                            DOWNLOAD REPORT
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-emerald-400 mb-4">Summary</h3>
                  <div className="border border-neutral-700 rounded overflow-hidden mb-8 text-sm">
                     <table className="w-full text-left">
                       <thead className="bg-neutral-800 border-b border-neutral-700">
@@ -1194,6 +1783,204 @@ export default function App() {
                    <div className="text-sm text-neutral-400 mb-8 italic">No deterministic findings blocking deployment.</div>
                  )}
 
+                 {selectedPlan === 'free' && (
+                   <div className="space-y-6 mb-8 animate-fadeIn">
+                     <div className="bg-neutral-900/50 border border-neutral-800 p-5 rounded-sm">
+                       <h3 className="text-sm font-bold text-neutral-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                         <Activity className="w-4 h-4 text-neutral-500" />
+                         Surface Verification Insights
+                       </h3>
+                       <div className="space-y-3">
+                         <div className="flex justify-between items-center text-[11px]">
+                           <span className="text-neutral-500 uppercase">Monte Carlo Lite (50 Iter)</span>
+                           <span className="text-emerald-400 font-mono">STABLE // 1.25% VAR</span>
+                         </div>
+                         <div className="flex justify-between items-center text-[11px]">
+                           <span className="text-neutral-500 uppercase">Drawdown Recovery Stress</span>
+                           <span className="text-neutral-300 font-mono">NOMINAL // 14 DAYS MAX</span>
+                         </div>
+                         <div className="flex justify-between items-center text-[11px]">
+                           <span className="text-neutral-500 uppercase">BTC/SPX Correlation Drift</span>
+                           <span className="text-neutral-300 font-mono">0.42 // LOW COUPLING</span>
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <div className="bg-neutral-900/10 border border-neutral-800/50 p-5 rounded-sm">
+                       <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                         <ShieldCheck className="w-4 h-4 text-neutral-600" />
+                         General Remediation
+                       </h3>
+                       <ul className="text-[11px] text-neutral-400 space-y-2 list-disc pl-4">
+                         <li>Review logic for potential overfitting in recent regimes.</li>
+                         <li>Consider adding basic volatility filter for entry conditions.</li>
+                         <li>Verify stop-loss execution safety vs. historical slippage spikes.</li>
+                        </ul>
+                      </div>
+
+                      <div className="mt-4 bg-cyan-950/20 border-2 border-cyan-500/50 p-8 rounded-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none group-hover:scale-125 transition-all duration-700">
+                          <Zap className="w-32 h-32 text-cyan-400" />
+                        </div>
+                        <div className="absolute -top-12 -left-12 w-64 h-64 bg-cyan-500/5 blur-[100px] rounded-full"></div>
+                        
+                        <div className="relative z-10">
+                          <div className="flex items-center gap-2 mb-4 shrink-0">
+                            <span className="bg-cyan-500 text-black text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">92% OFF</span>
+                            <span className="text-cyan-400 font-mono text-[10px] tracking-widest uppercase font-bold">// ADVERSARIAL_UNLOCK</span>
+                          </div>
+                          
+                          <h3 className="text-2xl font-black text-white tracking-tighter mb-3 leading-tight uppercase italic">
+                            Missing the <span className="text-cyan-400">Remediation Protocol</span>
+                          </h3>
+                          
+                          <p className="text-sm text-neutral-400 mb-8 max-w-lg leading-relaxed">
+                            Standard reports only signal failures. Upgrade to <span className="text-cyan-400 font-bold">Deep Analysis</span> to see exact parameter remediation, retested OOS configurations, and the full AlgoXpert human-audit log for {selectedStrategy}.
+                          </p>
+                          
+                          <div className="flex flex-col sm:flex-row gap-4 items-center">
+                            <button 
+                              onClick={() => { setPaymentStrategyName(selectedStrategy); setPaymentStep('form'); setPaymentError(null); setShowPaymentModal(true); }}
+                              className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs px-10 py-4 uppercase tracking-[0.2em] transition-all shadow-[0_0_30px_rgba(6,182,212,0.5)] cursor-pointer active:scale-[0.97] flex items-center justify-center gap-3"
+                            >
+                              <LockOpen className="w-4 h-4" />
+                              Unlock Report — $3.99
+                            </button>
+                            <span className="text-[10px] text-neutral-500 font-mono uppercase tracking-widest">
+                              LIMITED PHASE 1 PRICING
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+                 )}
+
+                 {selectedPlan === 'deep_analysis_3_99' && (
+                   <div className="space-y-8 mb-8 animate-fadeIn">
+                      {/* Slippage Sensitivity */}
+                      <div>
+                        <h3 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 shrink-0" />
+                          Slippage Sensitivity Range
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                           {[
+                             { label: 'Optimistic (0.5x)', pf: '1.82', status: 'Stable' },
+                             { label: 'Realistic (1.0x)', pf: '1.45', status: 'Nominal' },
+                             { label: 'Conservative (1.5x)', pf: '0.98', status: 'Fragile' }
+                           ].map(item => (
+                             <div key={item.label} className="bg-neutral-900 border border-neutral-800 p-3">
+                               <div className="text-[10px] text-neutral-500 uppercase tracking-widest">{item.label}</div>
+                               <div className="text-xl font-bold text-white mt-1">PF {item.pf}</div>
+                               <div className={`text-[10px] uppercase font-bold mt-2 ${item.status === 'Fragile' ? 'text-red-400' : 'text-cyan-400'}`}>// {item.status}</div>
+                             </div>
+                           ))}
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-3 italic">Strategy edge degrades significantly beyond 1.2x expected slippage. Execution quality is critical.</p>
+                      </div>
+
+                      {/* Reproducibility Trail */}
+                      <div>
+                        <h3 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                          <Database className="w-5 h-5 shrink-0" />
+                          Reproducibility & OOS Trail
+                        </h3>
+                        <div className="bg-neutral-900 border border-neutral-800 p-4 font-mono text-xs space-y-2">
+                           <div className="flex justify-between border-b border-neutral-800 pb-2">
+                             <span className="text-neutral-500">GIT_COMMIT_HASH</span>
+                             <span className="text-neutral-300">0x{generateHex(16).toLowerCase()}</span>
+                           </div>
+                           <div className="flex justify-between border-b border-neutral-800 pb-2">
+                             <span className="text-neutral-500">DATA_PARQUET_ID</span>
+                             <span className="text-neutral-300">pq_{generateHex(8).toLowerCase()}_v4</span>
+                           </div>
+                           <div className="flex justify-between border-b border-neutral-800 pb-2">
+                             <span className="text-neutral-500">INDICATOR_PARAMS</span>
+                             <span className="text-neutral-300">MA_LEN: 24, RSI: 14, VOL_MULT: 1.5</span>
+                           </div>
+                           <div className="flex justify-between">
+                             <span className="text-neutral-500">TEST_SLICE</span>
+                             <span className="text-neutral-300">2018-01-01 to 2024-05-25</span>
+                           </div>
+                        </div>
+                      </div>
+
+                      {/* Parameter Sensitivity Surface */}
+                      <div>
+                        <h3 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                          <Activity className="w-5 h-5 shrink-0" />
+                          Parameter Sensitivity Surface
+                        </h3>
+                        <div className="bg-neutral-900 border border-neutral-800 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                           <div className="w-full h-24 flex items-end gap-1 px-4">
+                              {Array.from({ length: 20 }).map((_, i) => (
+                                <div 
+                                 key={i} 
+                                 className={`flex-1 ${i > 7 && i < 13 ? 'bg-cyan-500' : 'bg-neutral-800'} transition-all`} 
+                                 style={{ height: `${20 + Math.sin(i / 3) * 10 + (i > 7 && i < 13 ? 40 : 0)}%` }}
+                                />
+                              ))}
+                           </div>
+                           <div className="w-full flex justify-between mt-4 text-[9px] text-neutral-500 uppercase tracking-widest px-4">
+                             <span>-20% VAR</span>
+                             <span className="text-cyan-400 font-bold">Optimization Plateau</span>
+                             <span>+20% VAR</span>
+                           </div>
+                           <div className="absolute top-4 right-4 text-[10px] text-cyan-400 font-bold bg-cyan-950/30 px-2 py-1 border border-cyan-800">ROBUST PLATEAU DETECTED</div>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-3 italic">Nudge tests (±10/20%) show a plateau-like surface. No "lucky chromosome" peaks identified in primary parameter sets.</p>
+                      </div>
+
+                      {/* Regime Performance */}
+                      <div>
+                        <h3 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                          <Settings className="w-5 h-5 shrink-0" />
+                          Regime-Segmented Results
+                        </h3>
+                        <div className="space-y-3">
+                           {[
+                             { label: 'Bull Market', pf: '1.92', win: '68%', color: 'text-emerald-400' },
+                             { label: 'Bear Market', pf: '0.62', win: '32%', color: 'text-red-400' },
+                             { label: 'Sideways / Chop', pf: '1.24', win: '51%', color: 'text-neutral-400' }
+                           ].map(regime => (
+                             <div key={regime.label} className="bg-neutral-900 border border-neutral-800 p-3 flex justify-between items-center">
+                                <div>
+                                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest">{regime.label}</div>
+                                  <div className={`text-sm font-bold ${regime.color}`}>PF {regime.pf}</div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest">Win Rate</div>
+                                  <div className="text-sm font-bold text-neutral-200">{regime.win}</div>
+                                </div>
+                             </div>
+                           ))}
+                        </div>
+                        <div className="mt-4 p-3 bg-red-950/20 border border-red-900/50 text-red-400 text-xs flex items-center gap-2">
+                           <ShieldAlert className="w-4 h-4 shrink-0" />
+                           <span><strong>Ticking Time Bomb:</strong> Strategy demonstrates significant alpha decay in Bear Regimes. Immediate hedge required for downtime.</span>
+                        </div>
+                      </div>
+
+                      {/* Kill Verdict */}
+                      <div className="bg-neutral-950 border border-cyan-500/50 p-6 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                        <div className="text-[10px] text-cyan-500 font-bold uppercase tracking-[0.3em] mb-4">Final Advisory // Explicit Kill Verdict</div>
+                        <div className="flex gap-6 items-center">
+                           <div className="w-20 h-20 rounded-full border-4 border-emerald-500 flex items-center justify-center shrink-0">
+                              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                           </div>
+                           <div className="space-y-2">
+                              <h4 className="text-lg font-bold text-white uppercase italic">Status: CONDITIONAL_DEPLOY</h4>
+                              <p className="text-xs text-neutral-400 leading-relaxed">
+                                Strategy passes primary logic gates but requires strict regime-filtering for bear markets. 
+                                <br/><span className="text-cyan-400 font-bold underline decoration-dotted">DO NOT DEPLOY</span> if bearer regime detectors signal &gt; 0.8 conf. 
+                                <br/>Human audit by AlgoXpert suggests limiting initial capital exposure to 25% of target allocation.
+                              </p>
+                           </div>
+                        </div>
+                      </div>
+                   </div>
+                 )}
+
                  {hasFailed && (
                    <>
                      <h3 className="text-lg font-bold text-emerald-400 mb-4">Failure Analysis</h3>
@@ -1219,6 +2006,166 @@ export default function App() {
         )}
 
       </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPaymentModal(false)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden"
+          >
+            {/* Modal Header */}
+            <div className="bg-neutral-950 px-6 py-4 border-b border-neutral-800 flex justify-between items-center">
+              <div>
+                <h3 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                  Secure Upgrade
+                </h3>
+                <p className="text-[10px] text-neutral-500 mt-1 uppercase font-mono">NEXUS Deep Analysis // {paymentStrategyName}</p>
+              </div>
+              <button 
+                onClick={() => setShowPaymentModal(false)}
+                className="text-neutral-500 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {paymentStep === 'form' ? (
+                <form onSubmit={handlePaymentSubmit} className="space-y-5">
+                  <div className="flex justify-between items-center p-4 bg-cyan-950/30 border border-cyan-500/30 rounded-sm relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+                    <div>
+                      <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest block mb-0.5">Early Adopter Tier</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-500 line-through font-mono">$49.00</span>
+                        <div className="bg-red-500/20 text-red-500 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter">Save $45+</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-black text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]">$3.99</div>
+                      <span className="text-[8px] text-neutral-500 uppercase tracking-widest block">One-time protocol fee</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold block mb-1.5">Cardholder Name</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full bg-neutral-950 border border-neutral-800 focus:border-cyan-500 focus:outline-none px-3 py-2 text-sm text-neutral-200 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold block mb-1.5">Card Number</label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-3 top-2.5 w-4 h-4 text-neutral-600" />
+                        <input 
+                          required
+                          type="text" 
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value)}
+                          placeholder="0000 0000 0000 0000"
+                          className="w-full bg-neutral-950 border border-neutral-800 focus:border-cyan-500 focus:outline-none pl-10 pr-3 py-2 text-sm text-neutral-200 transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold block mb-1.5">Expiry</label>
+                        <input 
+                          required
+                          type="text" 
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(e.target.value)}
+                          placeholder="MM/YY"
+                          className="w-full bg-neutral-950 border border-neutral-800 focus:border-cyan-500 focus:outline-none px-3 py-2 text-sm text-neutral-200 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold block mb-1.5">CVC</label>
+                        <input 
+                          required
+                          type="text" 
+                          value={cardCvc}
+                          onChange={(e) => setCardCvc(e.target.value)}
+                          placeholder="000"
+                          className="w-full bg-neutral-950 border border-neutral-800 focus:border-cyan-500 focus:outline-none px-3 py-2 text-sm text-neutral-200 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {paymentError && (
+                    <div className="p-3 bg-red-950/20 border border-red-900/50 text-red-400 text-[10px] flex items-center gap-2">
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {paymentError}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold uppercase tracking-widest py-3 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                  >
+                    Pay $3.99 & Unlock
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+
+                  <div className="flex items-center justify-center gap-4 pt-2">
+                    <div className="flex items-center gap-1.5 text-[9px] text-neutral-600 uppercase font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Encrypted
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[9px] text-neutral-600 uppercase font-bold">
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      One-time charge
+                    </div>
+                  </div>
+                </form>
+              ) : paymentStep === 'processing' ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center">
+                  <div className="relative w-16 h-16 mb-6">
+                    <RefreshCw className="w-16 h-16 text-cyan-500 animate-spin opacity-20" />
+                    <Cpu className="absolute inset-0 m-auto w-8 h-8 text-cyan-400 animate-pulse" />
+                  </div>
+                  <h4 className="text-white font-bold tracking-widest uppercase mb-2">Authorizing Transaction</h4>
+                  <p className="text-[10px] text-neutral-500 font-mono">Routing through secure gateway...</p>
+                  <div className="mt-8 w-48 h-1 bg-neutral-800 overflow-hidden relative">
+                    <motion.div 
+                      className="absolute inset-0 bg-cyan-500"
+                      initial={{ left: '-100%' }}
+                      animate={{ left: '100%' }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <h4 className="text-emerald-400 font-bold tracking-widest uppercase mb-2">Payment Confirmed</h4>
+                  <p className="text-[10px] text-neutral-300 font-mono">NEXUS Deep Analysis Unlocked.</p>
+                  <p className="text-[9px] text-neutral-500 mt-4 leading-relaxed">Initializing deep adversarial scan sequence...</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <div className="absolute bottom-4 left-4 text-[10px] text-neutral-600 hidden md:block">
         SYSTEMS: NOMINAL // CACHE: CLEARED // LATENCY: 14ms
